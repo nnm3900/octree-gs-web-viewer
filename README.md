@@ -5,13 +5,20 @@ This page provides an exprimental web viewer for [Octree-GS [Ren 2024]](https://
 `npm install`  
 `npx webpack`  
 `npx light-server -s . -p 8080`  
-and open your browser and navigate to the URL.  
+and open your browser with http://localhost:8080/  
 
-## for your data
-Place the trained data of Octree-GS as follows  
+## for your own data
+1. Place the trained data of Octree-GS as follows  
 root/  
 ├── gs-data/  
 │   ├── point_cloud.ply  
 │   ├── color_mlp.pt  
 │   ├── cov_mlp.pt  
 │   ├── opacity_mlp.pt  
+
+2. Set up python environment
+`conda env create --file environment.yml`  
+`conda activate octree-`
+
+3. Click on “run.bat” to convert the data
+

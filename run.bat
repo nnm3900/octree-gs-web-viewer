@@ -1,6 +1,6 @@
 @echo off
 
-call conda activate gs-viewer
+call conda activate octree-viewer
 
 python convert-gs-data.py
 

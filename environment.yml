@@ -1,4 +1,4 @@
-name: gs-viewer
+name: octree-viewer
 channels:
   - defaults
 dependencies:
