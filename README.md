@@ -6,3 +6,12 @@ This page provides an exprimental web viewer for [Octree-GS [Ren 2024]](https://
 `npx webpack`
 `npx light-server -s . -p 8080`
 and open your browser and navigate to the URL.
+
+## for your data
+Place the trained data of Octree-GS as follows
+root/
+├── gs-data/
+│   ├── point_cloud.ply
+│   ├── color_mlp.pt
+│   ├── cov_mlp.pt
+│   ├── opacity_mlp.pt
