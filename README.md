@@ -18,8 +18,8 @@ root/
 
 2. Set up python environment
 `conda env create --file environment.yml`  
-`conda activate octree-`
-
+`conda activate octree-`  
+  
 3. Click on “run.bat” to convert the data
 
 ## Note
