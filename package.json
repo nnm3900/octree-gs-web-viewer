@@ -1,0 +1,15 @@
+{
+  "name": "Simple web viewer for Octree-GS",
+  "private": true,
+  "version": "1.0.0",
+  "description": "his page provides an exprimental web viewer for Octree-GS.",
+  "dependencies": {
+    "onnxruntime-web": "^1.15.1",
+    "three": "^0.164.1"
+  },
+  "devDependencies": {
+    "copy-webpack-plugin": "^8.1.1",
+    "webpack": "^5.36.2",
+    "webpack-cli": "^4.6.0"
+  }
+}
