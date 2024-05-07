@@ -22,3 +22,6 @@ root/
 
 3. Click on “run.bat” to convert the data
 
+## Note
+Although Octree-GS features Level-of-Detail (LOD), the current version does not support LOD. Therefore, the rendering process requires computation of entire Gaussians, making it difficult to display on smartphones.  
+Scaffold-GS precedes Octree-GS; both were published by the same research group and have the same data format. Therefore, this viewer may be applicable to Scaffold-GS, but we have not tried it.
