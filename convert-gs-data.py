@@ -80,10 +80,10 @@ def convert_ply(SourceDir, OutputDir, ply_file_path):
         for j in range(32):
             sorted_anchor_features.append(vert["f_anchor_feat_" + str(j)][i])
 
-    save_bin(sorted_anchor_pos, "anchor_positions.bin")
-    save_bin(sorted_gsplat_positions, "gsplat_positions.bin")
-    save_bin(sorted_anchor_scales, "anchor_scales.bin")
-    save_bin(sorted_anchor_features, "anchor_features.bin")
+    save_bin(sorted_anchor_pos, OutputDir + "anchor_positions.bin")
+    save_bin(sorted_gsplat_positions, OutputDir + "gsplat_positions.bin")
+    save_bin(sorted_anchor_scales, OutputDir + "anchor_scales.bin")
+    save_bin(sorted_anchor_features, OutputDir + "anchor_features.bin")
 
 def save_bin(data, output_path):
     buffer = BytesIO()
