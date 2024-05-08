@@ -25,7 +25,7 @@ async function init() {
   const buffer_gsplat_positions = await loadFile("./converted/gsplat_positions.bin");
   gsplat_positions = new Float32Array(buffer_gsplat_positions);
 
-  anchorCount = anchor_features.length / 32;
+  anchorCount = 10000;//anchor_features.length / 32;
   vertexCount = anchorCount * 10;
 
   anchor_feature_with_camera = new Float32Array(35 * anchorCount);

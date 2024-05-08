@@ -59,6 +59,8 @@ def convert_ply(SourceDir, OutputDir, ply_file_path):
     sorted_gsplat_positions = []
     sorted_anchor_scales = []
     sorted_anchor_features = []
+    sorted_anchor_levels = []
+    sorted_anchor_extra_levels = []
 
     offset_names = [p.name for p in vert.properties if p.name.startswith("f_offset")]
     offset_names = sorted(offset_names, key=lambda x: int(x.split('_')[-1]))
@@ -71,6 +73,8 @@ def convert_ply(SourceDir, OutputDir, ply_file_path):
         sorted_anchor_pos.append(vert["x"][i])
         sorted_anchor_pos.append(vert["y"][i])
         sorted_anchor_pos.append(vert["z"][i])
+        sorted_anchor_levels.append(vert["level"][i])
+        sorted_anchor_extra_levels.append(vert["extra_level"][i])
         for j in range(10):
             sorted_gsplat_positions.append(vert["x"][i] + offsets[i][0][j] * np.exp(vert["scale_0"][i]))
             sorted_gsplat_positions.append(vert["y"][i] + offsets[i][1][j] * np.exp(vert["scale_1"][i]))
@@ -80,10 +84,25 @@ def convert_ply(SourceDir, OutputDir, ply_file_path):
         for j in range(32):
             sorted_anchor_features.append(vert["f_anchor_feat_" + str(j)][i])
 
+    count_elements(sorted_anchor_levels)
+    count_elements(sorted_anchor_extra_levels)
+
     save_bin(sorted_anchor_pos, OutputDir + "anchor_positions.bin")
     save_bin(sorted_gsplat_positions, OutputDir + "gsplat_positions.bin")
     save_bin(sorted_anchor_scales, OutputDir + "anchor_scales.bin")
     save_bin(sorted_anchor_features, OutputDir + "anchor_features.bin")
+    save_bin(sorted_anchor_levels, OutputDir + "anchor_levels.bin")
+    save_bin(sorted_anchor_extra_levels, OutputDir + "anchor_extra_levels.bin")
+
+def count_elements(lst):
+    count_dict = {}
+    for item in lst:
+        if int(item) in count_dict:
+            count_dict[int(item)] += 1
+        else:
+            count_dict[int(item)] = 1
+    for key, value in count_dict.items():
+        print(f"{key}: {value}")
 
 def save_bin(data, output_path):
     buffer = BytesIO()
