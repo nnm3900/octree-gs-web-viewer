@@ -2,7 +2,6 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import * as ort from 'onnxruntime-web';
 
-// Create the renderer
 var renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setClearColor(0xffffff, 0);
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -14,7 +13,7 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   200.0
 );
-camera.position.set(0, 0, 3);
+camera.position.set(2.166491, 1.068512, 5.222922);
 scene.add(camera);
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
