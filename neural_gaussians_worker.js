@@ -15,7 +15,6 @@ async function loadFile(url) {
 }
 
 async function init() {
-  console.log('initStart');
   const buffer_anchor_pos = await loadFile("./converted/anchor_positions.bin");
   anchor_pos = new Float32Array(buffer_anchor_pos);
   const buffer_anchor_scale = await loadFile("./converted/anchor_scales.bin");
