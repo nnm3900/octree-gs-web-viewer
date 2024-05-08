@@ -14,7 +14,7 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   200.0
 );
-camera.position.set(2.166491, 1.068512, 5.222922);
+camera.position.set(0, 0, 3);
 scene.add(camera);
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
@@ -117,87 +117,6 @@ window.addEventListener("resize", () => {
   material.uniforms.focal.value = focal;
 });
 
-/*
-async function main() {    
-  const neural_gaussians_worker = new Worker('neural_gaussians_worker.js');
-  const sort_gaussians_worker = new Worker('sort_gaussians_worker.js');
-  let vertexCount;
-  let matrices
-  await new Promise((resolve) => {
-    neural_gaussians_worker .onmessage = (e) => {
-      if (e.data.type === 'initDone') {
-        vertexCount = e.data.vertexCount;
-        resolve();
-      }
-    };
-    neural_gaussians_worker .postMessage({ type: 'init' });
-  });
-  await new Promise((resolve) => {
-    neural_gaussians_worker .onmessage = (e) => {
-      if (e.data.type === 'computeAndSortDone') {
-        const sortedMatrices = new Float32Array(e.data.sortedMatrices);
-        matrices = sortedMatrices;
-        resolve();
-      }
-    };
-    const view = new Float32Array([
-      camera.matrixWorld.elements[2],
-      camera.matrixWorld.elements[6],
-      camera.matrixWorld.elements[10],
-    ]);
-    neural_gaussians_worker .postMessage({
-      type: 'computeAndSort',
-      camera_position: camera.position,
-      view: view,
-    });
-  });
-  const iMesh = new THREE.InstancedMesh(geometry, material, vertexCount);
-  iMesh.frustumCulled = false;
-  iMesh.instanceMatrix.array = matrices;
-  iMesh.instanceMatrix.needsUpdate = true;
-  scene.add(iMesh);
-
-  let view = new Float32Array([
-    camera.matrixWorld.elements[2],
-    camera.matrixWorld.elements[6],
-    camera.matrixWorld.elements[10],
-  ]);
-  let isWorkerBusy = false;
-  worker.onmessage = (e) => {
-    if (e.data.type === 'computeAndSortDone') {
-      const sortedMatrices = new Float32Array(e.data.sortedMatrices);
-      iMesh.instanceMatrix.array = sortedMatrices;
-      iMesh.instanceMatrix.needsUpdate = true;
-      isWorkerBusy = false;
-    }
-  };
-
-  let prevCameraPosition = new THREE.Vector3();
-  animate();
-  function animate() {
-    requestAnimationFrame(animate);
-    if (!prevCameraPosition.equals(camera.position)) {
-      if (!isWorkerBusy) {
-        isWorkerBusy = true;
-        const view = new Float32Array([
-          camera.matrixWorld.elements[2],
-          camera.matrixWorld.elements[6],
-          camera.matrixWorld.elements[10],
-        ]);
-        worker.postMessage({
-          type: 'computeAndSort',
-          camera_position: camera.position,
-          view: view,
-        });
-        prevCameraPosition.copy(camera.position);
-      }
-    }
-
-    controls.update();
-    renderer.render(scene, camera);
-  }
-}
-*/
 async function main() {
   const neural_gaussians_worker = new Worker('neural_gaussians_worker.js');
   const sort_gaussians_worker = new Worker('sort_gaussians_worker.js');
