@@ -13,7 +13,7 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   200.0
 );
-camera.position.set(0, 0, -3);
+camera.position.set(0, 0, 3);
 scene.add(camera);
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
@@ -31,10 +31,11 @@ const material = new THREE.ShaderMaterial({
             varying vec2 vPosition;
             uniform vec2 viewport;
             uniform float focal;
-
+            varying vec4 vPos2d;
             void main () {
                 vec4 center = vec4(instanceMatrix[3][0], instanceMatrix[3][1], instanceMatrix[3][2], 1);
                 // Adjust View Pose
+                /*
                 mat4 adjViewMatrix = inverse(viewMatrix);
                 adjViewMatrix[0][1] *= -1.0;
                 adjViewMatrix[1][0] *= -1.0;
@@ -42,14 +43,19 @@ const material = new THREE.ShaderMaterial({
                 adjViewMatrix[2][1] *= -1.0;
                 adjViewMatrix[3][1] *= -1.0;
                 adjViewMatrix = inverse(adjViewMatrix);
-                mat4 modelView = adjViewMatrix * modelMatrix;
+                */
+                mat4 adjViewMatrix = viewMatrix; ///
+                mat4 modelView = adjViewMatrix ;
 
-                vec4 camspace = modelView * center;
-                vec4 pos2d = projectionMatrix * mat4(1,0,0,0,0,-1,0,0,0,0,1,0,0,0,0,1)  * camspace;
+                //vec4 camspace = modelView * center;
+                vec4 camspace = viewMatrix * center; ////
+                vec4 pos2d_0 = mat4(1,0,0,0,0,-1,0,0,0,0,1,0,0,0,0,1)  * camspace;
+                vec4 pos2d = projectionMatrix * pos2d_0;
+                //vPos2d = pos2d;
+                vPos2d = vec4(viewMatrix[0][3], viewMatrix[1][0], viewMatrix[1][1], center[3]);
 
-                float bounds = 1.2 * pos2d.w;
-                if (pos2d.z < -pos2d.w || pos2d.x < -bounds || pos2d.x > bounds
-                    || pos2d.y < -bounds || pos2d.y > bounds) {
+                float bounds = 1.2 * pos2d[3];
+                if (pos2d[2] < -pos2d[3] || pos2d[0] < -bounds || pos2d[0] > bounds || pos2d[1] < -bounds || pos2d[1] > bounds) {
                     gl_Position = vec4(0.0, 0.0, 2.0, 1.0);
                     return;
                 }
@@ -88,12 +94,13 @@ const material = new THREE.ShaderMaterial({
             }`,
   fragmentShader: `varying vec4 vColor;
             varying vec2 vPosition;
-
+            varying vec4 vPos2d;
             void main () {
                 float A = -dot(vPosition, vPosition);
                 if (A < -4.0) discard;
                 float B = exp(A) * vColor.a;
                 gl_FragColor = vec4(B * vColor.rgb, B);
+                //gl_FragColor = vec4(vec3(vPos2d.x, vPos2d.y, vPos2d.z), 1);
             }`,
 });
 material.blending = THREE.CustomBlending;
@@ -117,33 +124,39 @@ window.addEventListener("resize", () => {
 });
 
 async function main() {
-  const neural_gaussians_worker = new Worker('neural_gaussians_worker.js');
-  const sort_gaussians_worker = new Worker('sort_gaussians_worker.js');
-
+  const worker = new Worker('worker.js');
   let vertexCount;
   let matrices;
-  let sortReady = true;
   let neuralReady = true;
   await new Promise((resolve) => {
-    neural_gaussians_worker.onmessage = (e) => {
+    worker.onmessage = (e) => {
       if (e.data.type === 'initDone') {
         vertexCount = e.data.vertexCount;
         resolve();
       }
     };
-    neural_gaussians_worker.postMessage({ type: 'init' });
+    worker.postMessage({ type: 'init' });
   });
+
   await new Promise((resolve) => {
-    neural_gaussians_worker.onmessage = (e) => {
+    worker.onmessage = (e) => {
       if (e.data.type === 'computeDone') {
-        matrices = new Float32Array(e.data.newmatrices);
+        matrices = new Float32Array(e.data.sortedmatrices);
         resolve();
       }
     };
     const camera_position = camera.position;
-    neural_gaussians_worker.postMessage({
+    const camera_viewMatrix = Array.from(camera.matrixWorldInverse.elements);
+    const camera_projectionMatrix = Array.from(camera.projectionMatrix.elements);
+    const window_size = [window.innerWidth, window.innerHeight];
+    const view = new Float32Array([camera.matrixWorld.elements[2], camera.matrixWorld.elements[6], camera.matrixWorld.elements[10],]);
+    worker.postMessage({
       type: 'compute',
       camera_position: camera_position,
+      camera_projectionMatrix: camera_projectionMatrix,
+      camera_viewMatrix: camera_viewMatrix,
+      window_size:  window_size,
+      view: view.buffer,
     });
   });
 
@@ -153,18 +166,13 @@ async function main() {
   iMesh.instanceMatrix.needsUpdate = true;
   scene.add(iMesh);
 
-  neural_gaussians_worker.onmessage = (e) => {
+  worker.onmessage = (e) => {
     if (e.data.type === 'computeDone') {
-      matrices = new Float32Array(e.data.newmatrices);
+      matrices = new Float32Array(e.data.sortedmatrices);
+      iMesh.instanceMatrix.array = matrices;
+      iMesh.instanceMatrix.needsUpdate = true;
       neuralReady = true;
     }
-  };
-
-  sort_gaussians_worker.onmessage = (e) => {
-    const sortedMatrices = new Float32Array(e.data.sortedMatrices);
-    iMesh.instanceMatrix.array = sortedMatrices;
-    iMesh.instanceMatrix.needsUpdate = true;
-    sortReady = true;
   };
 
   let prevCameraPosition = new THREE.Vector3();
@@ -176,22 +184,20 @@ async function main() {
       if (neuralReady) {
         neuralReady = false;
         const camera_position = camera.position;
-        neural_gaussians_worker.postMessage({
+        const camera_projectionMatrix = Array.from(camera.projectionMatrix.elements);
+        const camera_viewMatrix =  Array.from(camera.matrixWorldInverse.elements);
+        const window_size = [window.innerWidth, window.innerHeight];
+        const view = new Float32Array([camera.matrixWorld.elements[2], camera.matrixWorld.elements[6], camera.matrixWorld.elements[10],]);
+        worker.postMessage({
           type: 'compute',
           camera_position: camera_position,
+          camera_projectionMatrix: camera_projectionMatrix,
+          camera_viewMatrix: camera_viewMatrix,
+          window_size:  window_size,
+          view: view.buffer,
         });
         prevCameraPosition.copy(camera.position);
       }
-    }
-    if (sortReady) {
-      sortReady = false;
-      const view = new Float32Array([camera.matrixWorld.elements[2], camera.matrixWorld.elements[6], camera.matrixWorld.elements[10],]);
-      const matricesCopy = Float32Array.from(matrices);
-      sort_gaussians_worker.postMessage({
-        matrices: matricesCopy.buffer,
-        view: view.buffer,},
-        [matricesCopy.buffer, view.buffer]
-      );
     }
     controls.update();
     renderer.render(scene, camera);
