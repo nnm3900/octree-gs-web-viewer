@@ -26,4 +26,6 @@ root/
 3. Click on “run.bat” to convert the data
 
 ## note
+The current version is slow in rendering speed, so any advice for speeding it up is welcome!  
+
 Scaffold-GS precedes Octree-GS; both were published by the same research group and have the same data format. Therefore, this viewer may be applicable to Scaffold-GS, but we have not tried it.
