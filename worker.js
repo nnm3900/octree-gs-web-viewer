@@ -189,7 +189,7 @@ function sortgaussians(matrices, view) {
 }
 
 async function run_onnx(anchor_feature_with_camera, anchorMaskedCount) {
-  batchSize = 1000;
+  batchSize = 10000;
   const color_mlp_output = new Float32Array(anchorMaskedCount * 30);
   const opacity_mlp_output = new Float32Array(anchorMaskedCount * 10);
   const cov_mlp_output = new Float32Array(anchorMaskedCount * 70);
