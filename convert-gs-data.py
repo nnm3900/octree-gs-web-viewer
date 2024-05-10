@@ -87,7 +87,7 @@ def convert_ply(SourceDir, OutputDir, ply_file_path):
 
     anchor_info.append(vert["info"][0])
     anchor_info.append(vert["info"][1])
-    
+
     count_elements(sorted_anchor_levels)
     count_elements(sorted_anchor_extra_levels)
 

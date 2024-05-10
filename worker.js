@@ -244,7 +244,7 @@ async function computeMtx(camera_position, camera_projectionMatrix, camera_viewM
       anchorVisibleIndices.push(i);
     }  
   }
-  //console.log("visible rate", anchorVisibleIndices.length / anchorCount);
+  console.log("visible filter rate", anchorVisibleIndices.length / anchorCount);
 
   const anchorLevelmaskedIndices = [];
   for (let i = 0; i < anchorVisibleIndices.length; i++) {
@@ -259,7 +259,7 @@ async function computeMtx(camera_position, camera_projectionMatrix, camera_viewM
       anchorLevelmaskedIndices.push(idx);
     }
   }
-  //console.log("level rate", anchorLevelmaskedIndices.length / anchorVisibleIndices.length, anchorLevelmaskedIndices.length);
+  console.log("level filter rate", anchorLevelmaskedIndices.length / anchorVisibleIndices.length, anchorLevelmaskedIndices.length);
 
   const anchorMaskedIndices =  anchorLevelmaskedIndices;
   const anchorMaskedCount = anchorMaskedIndices.length;
