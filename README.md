@@ -28,4 +28,6 @@ root/
 ## note
 The current version is slow in rendering speed, so any advice for speeding it up is welcome!  
 
-Scaffold-GS precedes Octree-GS; both were published by the same research group and have the same data format. Therefore, this viewer may be applicable to Scaffold-GS, but we have not tried it.
+Scaffold-GS precedes Octree-GS; both were published by the same research group and have the same data format. Therefore, this viewer may be applicable to Scaffold-GS, but we have not tried it.  
+
+convert-to-stabdard-ply.py can convert octree-gs fromat to standard-gs format. 
