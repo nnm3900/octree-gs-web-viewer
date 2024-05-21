@@ -39,7 +39,7 @@ class Octree:
                 child.get_sorted_indices(indices)
         indices.extend(self.indices)
 
-def convert_ply(SourceDir, OutputDir, ply_file_path):
+def convert_ply(SourceDir, OutputDir, ply_file_path, camera_position):
     plydata = PlyData.read(SourceDir + ply_file_path)
     vert = plydata["vertex"]
 
@@ -83,10 +83,8 @@ def convert_ply(SourceDir, OutputDir, ply_file_path):
             anchor_features.append(vert["f_anchor_feat_" + str(j)][i])
 
     gaussians_num_per_anchor = 10
-    camera_position = np.array([0, 0, 0])
     anchor_num = len(anchor_pos) // 3
     gaussians_num = anchor_num * gaussians_num_per_anchor
-    print("num_gaussians: ", gaussians_num)
     dtype = [('x', 'f4'), ('y', 'f4'), ('z', 'f4'),
          ('nx', 'f4'), ('ny', 'f4'), ('nz', 'f4'),
          ('f_dc_0', 'f4'), ('f_dc_1', 'f4'), ('f_dc_2', 'f4'),
@@ -168,10 +166,10 @@ def convert_ply(SourceDir, OutputDir, ply_file_path):
     gaussian_data['rot_2'] = cov_vec_2
     gaussian_data['rot_3'] = cov_vec_3
 
-    opacity_threshold = -100
+    opacity_threshold = -10
     filtered_gaussian_data = []
     for i in range(gaussians_num):
-        if opacity_output[i] > opacity_threshold:
+        if gaussian_data['opacity'][i] > opacity_threshold:
             gaussian_data_item = tuple(gaussian_data[i])
             filtered_gaussian_data.append(gaussian_data_item)
 
@@ -188,5 +186,6 @@ def sigmoid(x):
 if __name__ == "__main__":
     SourceDir = "./gs-data/"
     OutputDir = "./converted/"
-    convert_ply(SourceDir, OutputDir, "point_cloud.ply")
+    camera_position = np.array([0, 0, 0])
+    convert_ply(SourceDir, OutputDir, "point_cloud.ply", camera_position)
 
